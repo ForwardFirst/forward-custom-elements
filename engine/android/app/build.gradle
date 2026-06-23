@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdk 34
+    namespace 'com.forwardfirst.mmorpg'
+
+    defaultConfig {
+        applicationId "com.forwardfirst.mmorpg"
+        minSdk 26          // Android 8.0 — OpenGL ES 3.0 guaranteed
+        targetSdk 34
+        versionCode 1
+        versionName "0.1.0"
+
+        ndk {
+            abiFilters "arm64-v8a", "x86_64"
+        }
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DANDROID_PLATFORM=android-26"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main {
+            kotlin.srcDirs = ['src/main/kotlin']
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+
+    // WebSocket client for multiplayer networking
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // JSON (lightweight, ships with Android but explicit dep for clarity)
+    implementation 'org.json:json:20231013'
+}
