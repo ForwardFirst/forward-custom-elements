@@ -12,6 +12,7 @@ object Packet {
     const val PLAYER_UPDATE = "player_update"
     const val PLAYER_LEAVE  = "player_leave"
     const val ENEMY_UPDATE  = "enemy_update"
+    const val ENEMY_BATCH   = "enemy_batch"
     const val CHAT          = "chat"
     const val PING          = "ping"
     const val PONG          = "pong"
@@ -88,6 +89,25 @@ class NetworkManager(private val hudView: HUDView, private val gameView: GameSur
             Packet.PLAYER_LEAVE -> {
                 val id = json.optInt("id")
                 gameView.queueEvent { GameBridge.nativeNetPlayerLeave(id) }
+            }
+            Packet.ENEMY_BATCH -> {
+                val arr = json.optJSONArray("enemies") ?: return
+                val count = arr.length()
+                // Build flat arrays to minimise queueEvent overhead
+                val ids = IntArray(count);   val hps = IntArray(count)
+                val xs  = FloatArray(count); val ys = FloatArray(count); val zs = FloatArray(count)
+                for(i in 0 until count) {
+                    val e  = arr.getJSONObject(i)
+                    ids[i] = e.optInt("id")
+                    xs[i]  = e.optDouble("x").toFloat()
+                    ys[i]  = e.optDouble("y").toFloat()
+                    zs[i]  = e.optDouble("z").toFloat()
+                    hps[i] = e.optInt("hp")
+                }
+                gameView.queueEvent {
+                    for(i in 0 until count)
+                        GameBridge.nativeNetEnemyUpdate(ids[i], xs[i], ys[i], zs[i], hps[i])
+                }
             }
             Packet.PING -> {
                 ws?.send(JSONObject().apply { put("type", Packet.PONG) }.toString())

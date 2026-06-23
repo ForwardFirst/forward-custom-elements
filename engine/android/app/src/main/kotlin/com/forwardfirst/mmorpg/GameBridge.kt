@@ -21,5 +21,6 @@ object GameBridge {
         yaw: Float, hp: Int, maxHp: Int, anim: Int, animTime: Float
     )
     @JvmStatic external fun nativeNetPlayerLeave(id: Int)
+    @JvmStatic external fun nativeNetEnemyUpdate(id: Int, x: Float, y: Float, z: Float, hp: Int)
     @JvmStatic external fun nativeDestroy()
 }

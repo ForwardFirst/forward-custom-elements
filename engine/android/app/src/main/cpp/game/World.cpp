@@ -244,8 +244,7 @@ void World::onNetworkPlayerLeave(uint32_t id) {
     remotePlayers.erase(id);
 }
 void World::onNetworkPlayerUpdate(const RemotePlayer& rp) {
-    auto it = remotePlayers.find(rp.id);
-    if(it != remotePlayers.end()) it->second = rp;
+    remotePlayers[rp.id] = rp;  // upsert — handles both join and update
 }
 void World::onNetworkEnemyUpdate(uint32_t id, Vec3 pos, int hp) {
     for(auto& e : enemies)

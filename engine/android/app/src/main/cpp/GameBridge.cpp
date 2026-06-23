@@ -163,4 +163,11 @@ Java_com_forwardfirst_mmorpg_GameBridge_nativeDestroy(
     LOGI("Game destroyed");
 }
 
+// Network: apply server-authoritative enemy state (position + hp)
+JNIEXPORT void JNICALL
+Java_com_forwardfirst_mmorpg_GameBridge_nativeNetEnemyUpdate(
+        JNIEnv*, jclass, jint id, jfloat x, jfloat y, jfloat z, jint hp) {
+    if(gWorld) gWorld->onNetworkEnemyUpdate((uint32_t)id, {x,y,z}, hp);
+}
+
 } // extern "C"
